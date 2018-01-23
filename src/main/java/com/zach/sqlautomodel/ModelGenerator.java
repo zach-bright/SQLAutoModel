@@ -20,12 +20,13 @@ public class ModelGenerator
      * Generates simple models given a destination and a dump file.
      *
      * @author zach-bright
+     * @param packageName String Name of the package the models are for.
      * @param srcFile File SQL dump file to generate models from.
      * @param destDir File Directory to write the models to.
      * @throws IOException If parsing the SQL dump fails or if the src/dest files are not valid.
      * @throws ClassNotFoundException If a column type in the dump file has no corresponding Java type.
      */
-    public void generate(File srcFile, File destDir) throws IOException, ClassNotFoundException {
+    public void generate(String packageName, File srcFile, File destDir) throws IOException, ClassNotFoundException {
         if (!srcFile.exists()) {
             throw new FileNotFoundException("SQL source file does not exist.");
         } else if (!srcFile.isFile()) {
@@ -63,13 +64,27 @@ public class ModelGenerator
             // Analyze last part of CREATE statement (closingStatement).
             // todo: add closing stuff as comment or metadata for model.
 
+            // Create the table class and JavaFile object.
+            TypeSpec tableClass = TypeSpec.classBuilder(tableName)
+                    .superclass(AbstractModel.class)
+                    .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
+                    .addFields(fieldList)
+                    .build();
+
             // Map each JavaFile to the table name.
-            //JavaFile jFile = this.generateModel(fieldList);
-            //modelFiles.put(tableName, jFile);
+            JavaFile jFile = JavaFile.builder(packageName, tableClass).build();
+            modelFiles.put(tableName, jFile);
         }
 
         // Create each model file from the map.
-
+        modelFiles.forEach((name, file) -> {
+            File destFile = new File(destDir.getPath() + file);
+            try {
+                file.writeTo(destFile);
+            } catch (IOException e) {
+                System.err.println("Model " + name + " failed to write: " + e.getMessage());
+            }
+        });
     }
 
     /**
@@ -121,15 +136,6 @@ public class ModelGenerator
             throw new ClassNotFoundException("No corresponding Java class found for SQL typestring " + typeString);
         }
         return FieldSpec.builder(columnClass, columnName).addModifiers(Modifier.PUBLIC).build();
-    }
-
-    /**
-     *
-     *
-     * @return
-     */
-    private File generateModel() {
-        return null;
     }
 
     /**
