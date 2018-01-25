@@ -33,6 +33,7 @@ public class ModelGeneratorTest extends TestCase {
         ModelGenerator mg = new ModelGenerator();
         try {
             mg.generate(
+                    "com.test.me",
                     new File("/home/ztb/IdeaProjects/SQLAutoModel/src/main/java/com/zach/sqlautomodel/sqldump"),
                     new File("/home/ztb/IdeaProjects/SQLAutoModel/src/main/java/com/zach/sqlautomodel/asdg")
             );
