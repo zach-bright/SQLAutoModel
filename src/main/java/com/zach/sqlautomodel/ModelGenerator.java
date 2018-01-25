@@ -44,36 +44,11 @@ public class ModelGenerator
         // Get all the columns for each string and send to the generator function.
         Map<String, JavaFile> modelFiles = new HashMap<>();
         for (String tableStatement : tableStatementList) {
-            String[] firstTwo = tableStatement.split("\\(", 2);
-            String createStart = firstTwo[0];
-            String columnDeclarations = firstTwo[1];
-            int closingParen = columnDeclarations.lastIndexOf(")");
-            String closingStatement = columnDeclarations.substring(closingParen + 1, columnDeclarations.length());
-            columnDeclarations = columnDeclarations.substring(0, closingParen + 1);
+            TypeSpec tableClass = buildClassFromTableString(tableStatement);
 
-            // Analyze first part of CREATE statement (createStart).
-            String tableName = this.findBacktickedName(createStart);
-
-            // Tokenize columns and analyze each.
-            StringTokenizer st = new StringTokenizer(columnDeclarations, ",");
-            List<FieldSpec> fieldList = new ArrayList<>();
-            while (st.hasMoreTokens()) {
-                fieldList.add(this.buildFieldFromColumnString(st.nextToken()));
-            }
-
-            // Analyze last part of CREATE statement (closingStatement).
-            // todo: add closing stuff as comment or metadata for model.
-
-            // Create the table class and JavaFile object.
-            TypeSpec tableClass = TypeSpec.classBuilder(tableName)
-                    .superclass(AbstractModel.class)
-                    .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
-                    .addFields(fieldList)
-                    .build();
-
-            // Map each JavaFile to the table name.
+            // Build and map each JavaFile to the table name.
             JavaFile jFile = JavaFile.builder(packageName, tableClass).build();
-            modelFiles.put(tableName, jFile);
+            modelFiles.put(tableClass.name, jFile);
         }
 
         // Create each model file from the map.
@@ -118,6 +93,43 @@ public class ModelGenerator
             }
         }
         return tableStatementList;
+    }
+    
+    /**
+     * Builds a TypeSpec for a class representing the provided table string.
+     * 
+     * @author zach-bright
+     * @param tableStatement String Table string to parse.
+     * @return A TypeSpec for a class representing the tableStatement string.
+     * @throws ClassNotFoundException If a column type in the dump file has no corresponding Java type.
+     */
+    private TypeSpec buildClassFromTableString(String tableStatement) throws ClassNotFoundException {
+        String[] firstTwo = tableStatement.split("\\(", 2);
+            String createStart = firstTwo[0];
+            String columnDeclarations = firstTwo[1];
+            int closingParen = columnDeclarations.lastIndexOf(")");
+            String closingStatement = columnDeclarations.substring(closingParen + 1, columnDeclarations.length());
+            columnDeclarations = columnDeclarations.substring(0, closingParen + 1);
+
+            // Analyze first part of CREATE statement (createStart).
+            String tableName = this.findBacktickedName(createStart);
+
+            // Tokenize columns and analyze each.
+            StringTokenizer st = new StringTokenizer(columnDeclarations, ",");
+            List<FieldSpec> fieldList = new ArrayList<>();
+            while (st.hasMoreTokens()) {
+                fieldList.add(this.buildFieldFromColumnString(st.nextToken()));
+            }
+
+            // Analyze last part of CREATE statement (closingStatement).
+            // todo: add closing stuff as comment or metadata for model.
+
+            // Create the table class and JavaFile object.
+            return TypeSpec.classBuilder(tableName)
+                    .superclass(AbstractModel.class)
+                    .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
+                    .addFields(fieldList)
+                    .build();
     }
 
     /**
