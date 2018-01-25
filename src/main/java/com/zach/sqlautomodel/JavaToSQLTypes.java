@@ -22,6 +22,7 @@ public enum JavaToSQLTypes {
     ROWID       (JDBCType.ROWID, RowId.class),
     XML         (JDBCType.SQLXML, SQLXML.class),
     DATE        (JDBCType.DATE, Date.class),
+    DATETIME    (JDBCType.TIMESTAMP, Timestamp.class),
     TIME        (JDBCType.TIME, Time.class),
     TIMESTAMP   (JDBCType.TIMESTAMP, Timestamp.class);
 
