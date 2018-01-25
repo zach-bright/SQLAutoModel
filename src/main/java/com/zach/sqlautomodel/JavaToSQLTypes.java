@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 
 public enum JavaToSQLTypes {
 
+    TINYINT     (JDBCType.TINYINT, Byte.class),
     SMALLINT    (JDBCType.SMALLINT, Short.class),
     INTEGER     (JDBCType.INTEGER, Integer.class),
     BIGINT      (JDBCType.BIGINT, Long.class),
@@ -64,6 +65,11 @@ public enum JavaToSQLTypes {
      * @return The class corresponding to the type or null if none found.
      */
     public static Class lookup(String type) {
+        // INT is a valid alias for INTEGER, but is not in JDBCType.
+        if (type.equals("INT")) {
+            return Integer.class;
+        }
+        
         for (JDBCType jdbcType : JDBCType.class.getEnumConstants()) {
             if (jdbcType.getName().equals(type)) {
                 return JavaToSQLTypes.lookup(jdbcType);

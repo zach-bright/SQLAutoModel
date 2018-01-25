@@ -44,7 +44,7 @@ public class ModelGenerator
         // Get all the columns for each string and send to the generator function.
         Map<String, JavaFile> modelFiles = new HashMap<>();
         for (String tableStatement : tableStatementList) {
-            String[] firstTwo = tableStatement.split("\\(", 1);
+            String[] firstTwo = tableStatement.split("\\(", 2);
             String createStart = firstTwo[0];
             String columnDeclarations = firstTwo[1];
             int closingParen = columnDeclarations.lastIndexOf("\\)");
@@ -130,7 +130,7 @@ public class ModelGenerator
      */
     private FieldSpec buildFieldFromColumnString(String token) throws ClassNotFoundException {
         String columnName = this.findBacktickedName(token);
-        String typeString = columnName.split(" ", 2)[1].replaceAll("(.*)", "");
+        String typeString = columnName.split(" ", 3)[1].replaceAll("(.*)", "");
         Class columnClass = JavaToSQLTypes.lookup(typeString.toUpperCase());
         if (columnClass == null) {
             throw new ClassNotFoundException("No corresponding Java class found for SQL typestring " + typeString);
