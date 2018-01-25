@@ -34,10 +34,12 @@ public class ModelGeneratorTest extends TestCase {
         try {
             mg.generate(
                     "com.test.me",
-                    new File("/home/ztb/IdeaProjects/SQLAutoModel/src/main/java/com/zach/sqlautomodel/sqldump"),
-                    new File("/home/ztb/IdeaProjects/SQLAutoModel/src/main/java/com/zach/sqlautomodel/asdg")
+                    new File("/home/UNBDOMAIN/zbright/SQLAutoModel/src/test/java/com/zach/sqlautomodel/sqldump"),
+                    new File("/home/UNBDOMAIN/zbright/SQLAutoModel/src/test/java/com/zach/sqlautomodel/destFolder")
             );
-        } catch (Exception e) {}
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
 
         assertTrue(true);
     }

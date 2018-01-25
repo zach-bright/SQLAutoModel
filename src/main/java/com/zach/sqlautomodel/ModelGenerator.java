@@ -47,7 +47,7 @@ public class ModelGenerator
             String[] firstTwo = tableStatement.split("\\(", 2);
             String createStart = firstTwo[0];
             String columnDeclarations = firstTwo[1];
-            int closingParen = columnDeclarations.lastIndexOf("\\)");
+            int closingParen = columnDeclarations.lastIndexOf(")");
             String closingStatement = columnDeclarations.substring(closingParen + 1, columnDeclarations.length());
             columnDeclarations = columnDeclarations.substring(0, closingParen + 1);
 
