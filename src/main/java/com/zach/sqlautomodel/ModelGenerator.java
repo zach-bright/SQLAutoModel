@@ -105,31 +105,33 @@ public class ModelGenerator
      */
     private TypeSpec buildClassFromTableString(String tableStatement) throws ClassNotFoundException {
         String[] firstTwo = tableStatement.split("\\(", 2);
-            String createStart = firstTwo[0];
-            String columnDeclarations = firstTwo[1];
-            int closingParen = columnDeclarations.lastIndexOf(")");
-            String closingStatement = columnDeclarations.substring(closingParen + 1, columnDeclarations.length());
-            columnDeclarations = columnDeclarations.substring(0, closingParen + 1);
+        String createStart = firstTwo[0];
+        String columnDeclarations = firstTwo[1];
+        int closingParen = columnDeclarations.lastIndexOf(")");
+        String closingStatement = columnDeclarations.substring(closingParen + 1, columnDeclarations.length());
+        columnDeclarations = columnDeclarations.substring(0, closingParen + 1);
 
-            // Analyze first part of CREATE statement (createStart).
-            String tableName = this.findBacktickedName(createStart);
+        // Analyze first part of CREATE statement (createStart).
+        String tableName = this.findBacktickedName(createStart);
 
-            // Tokenize columns and analyze each.
-            StringTokenizer st = new StringTokenizer(columnDeclarations, ",");
-            List<FieldSpec> fieldList = new ArrayList<>();
-            while (st.hasMoreTokens()) {
-                fieldList.add(this.buildFieldFromColumnString(st.nextToken()));
-            }
+        // Tokenize columns and analyze each.
+        StringTokenizer st = new StringTokenizer(columnDeclarations, ",");
+        List<FieldSpec> fieldList = new ArrayList<>();
+        while (st.hasMoreTokens()) {
+            // 
 
-            // Analyze last part of CREATE statement (closingStatement).
-            // todo: add closing stuff as comment or metadata for model.
+            fieldList.add(this.buildFieldFromColumnString(st.nextToken()));
+        }
 
-            // Create the table class and JavaFile object.
-            return TypeSpec.classBuilder(tableName)
-                    .superclass(AbstractModel.class)
-                    .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
-                    .addFields(fieldList)
-                    .build();
+        // Analyze last part of CREATE statement (closingStatement).
+        // todo: add closing stuff as comment or metadata for model.
+
+        // Create the table class and JavaFile object.
+        return TypeSpec.classBuilder(tableName)
+                .superclass(AbstractModel.class)
+                .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
+                .addFields(fieldList)
+                .build();
     }
 
     /**
